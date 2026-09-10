@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('project_dependencies', function (Blueprint $table) {
             $table->unsignedBigInteger('project_id');
-            $table->unsignedBigInteger('depens_on_project_id');
+            $table->unsignedBigInteger('depends_on_project_id');
             $table->primary(['project_id', 'depends_on_project_id']);
             $table->foreign('project_id')->references('id')->on('projects')->cascadeOnDelete();
             $table->foreign('depends_on_project_id')->references('id')->on('projects')->cascadeOnDelete();
