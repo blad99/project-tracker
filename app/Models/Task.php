@@ -83,4 +83,57 @@ class Task extends Model
             'children'       => [],
         ];
     }
+
+    public function getBlockingDependencies(array $newDepIds = []): array
+    {
+        $notDone = $this->dependencies()
+            ->where('tasks.status', '!=', 'Done')
+            ->pluck('tasks.name')
+            ->toArray();
+
+        foreach($newDepIds as $depId) {
+            if((int) $depId === $this->id) continue;
+            
+            $dep = Task::find($depId);
+            if($dep && $dep->status !== 'Done' && !in_array($dep->name, $notDone)) {
+                $notDone[] = $dep->name;
+            }
+        }
+
+        return $notDone;
+    }
+
+    public function wouldCreateCircular(int $newDepIds): bool
+    {
+        $visited = [];
+        $stack = [$newDepIds];
+
+        while(!empty($stack)) {
+            $currentId = array_pop($stack);
+            if($currentId === $this->id) return true;
+
+            if(isset($visited[$currentId])) continue;
+            $visited[$currentId] = true;
+
+            $deps = Task::find($currentId)->dependencies()->pluck('tasks.id')->toArray() ?? [];
+            foreach($deps as $depId) {
+                $stack[] = $depId;
+            }
+        }
+
+        return false;
+    }
+
+    public function revalidateDependents(): void
+    {
+        if($this->status === 'Done') return;
+
+        $doneDependents = $this->dependencies()->where('tasks.status', 'Done')->get();
+        foreach($doneDependents as $dep) {
+            $dep->update(['status' => 'In Progress']);
+            $dep->project->recalculate();
+            $dep->revalidateDependents();
+        }
+    }
+
 }
