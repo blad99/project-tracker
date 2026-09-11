@@ -128,10 +128,12 @@ class Task extends Model
     {
         if($this->status === 'Done') return;
 
-        $doneDependents = $this->dependencies()->where('tasks.status', 'Done')->get();
+        $doneDependents = $this->dependents()->where('tasks.status', 'Done')->get();
         foreach($doneDependents as $dep) {
             $dep->update(['status' => 'In Progress']);
-            $dep->project->recalculate();
+            if ($dep->project) {
+                $dep->project->recalculate();
+            }
             $dep->revalidateDependents();
         }
     }
