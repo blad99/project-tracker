@@ -75,7 +75,7 @@ class Task extends Model
             'status'         => $this->status,
             'weight'         => $this->weight,
             'created_at'     => $this->created_at?->toIso8601String(),
-            'dependencies'   => $this->dependencies()->map(fn($d) => [
+            'dependencies'   => $this->dependencies->map(fn($d) => [
                 'id'     => $d->id,
                 'name'   => $d->name,
                 'status' => $d->status

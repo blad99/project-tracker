@@ -60,7 +60,7 @@ class Project extends Model
             'start_date'            => $this->start_date?->format('Y-m-d'),
             'end_date'              => $this->end_date?->format('Y-m-d'),
             'created_at'            => $this->created_at?->toIso8601String(),
-            'dependencies'          => $this->dependencies()->map(fn($d) => [
+            'dependencies'          => $this->dependencies->map(fn($d) => [
                 'id'     => $d->id,
                 'name'   => $d->name,
                 'status' => $d->status
@@ -116,7 +116,7 @@ class Project extends Model
        return false;
     }
 
-    public function findScheduleConflict(string $start, string $end, int $excludeId = 0): ?string
+    public static function findScheduleConflict(string $start, string $end, int $excludeId = 0): ?string
     {
         $conflict = static::where('id', '!=', $excludeId)
             ->whereNotNull('start_date')
@@ -144,7 +144,7 @@ class Project extends Model
         if ($status !== 'Draft') {
             $blockedDep = $this->dependencies()->where('status', '!=', 'Done')->exists();
             if ($blockedDep) {
-                $status = 'Blocked';
+                $status = 'Draft';
             }
         }
 
