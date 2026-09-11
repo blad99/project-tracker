@@ -1,0 +1,28 @@
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: #f8f9fa;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.subtask {
+    margin-left: 2rem;
+    border-left: 2px solid #dee2e6;
+}
+
+.chev-icon {
+    transition: transform 0.2s;
+}
+
+.chev-icon.open {
+    transform: rotate(90deg);
+}
+
+.toast-container {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1055;
+}
